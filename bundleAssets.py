@@ -6,6 +6,7 @@ import time
 import json
 import redis
 import codecs
+import hashlib
 import argparse
 import multiprocessing
 from qb_model import QB
