@@ -69,7 +69,6 @@ class Calc:
                 if index == 0:
                     continue
                 file_info = file_item.split('\t')
-                print('[Calc_Model]: 当前列数'+str(len(file_info)))
                 file_count = file_count + 1
                 if file_info[1] != '文件大小(在bundle中的大小)':
                     file_size = file_size + int(file_info[1])

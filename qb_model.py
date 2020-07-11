@@ -37,15 +37,13 @@ RESOURCE_URL = 'http://10.11.10.86/download/resource_package'
 
 
 class QB:
-    def __init__(self, build_id, bundle_data_path, bundle_download_path, aba_bundle_path, asset_cache_path, out_path):
+    def __init__(self, build_id, tree_flag, input_path, out_path):
         self.build_id = build_id
-        self.bundle_data_path = bundle_data_path
-        self.bundle_download_path = bundle_download_path
-        self.aba_bundle_path = aba_bundle_path
+        self.input_path = input_path
+        self.tree_flag = tree_flag
         # AssetsCageData
         self.ASSET_CACHE_PATH = {}
         # 用来转化文件路径为svn路径
-        self.asset_cache_path = asset_cache_path
         self.out_path = out_path
         self._reload()
         self._save_bundle_file()
@@ -53,34 +51,18 @@ class QB:
         self._save_scene_away()
 
     def _reload(self):
-        # build_svn build_time
         self.build_svn, self.build_time = self._load_build_info()
-        # self.asset_cache_path
         self._load_asset_cache()
-        # BundleData.txt
         self.APK_DLC_OTHER = self._load_bundle_data()
-        # BundleDownloadInfo.txt
-        self.DOWNLOAD_FIRST_DLC = self._load_bundle_download()
-        # 根据BundleDownloadInfo.txt 数据重新排了一下apk first dlc other 资源分布
-        self._set_apk_dlc_other()
-        if self.bundle_download_path == '' and self.bundle_data_path == '':
-            print('[QB_MODEL]: 更新包资源分析 不需要BundleDownLoad.txt installpacksize.txt 文件')
-        else:
-            print('[QB_MODEL]: 全包资源分析 需要BundleData.txt BundleDownLoad.txt installpacksize.txt 文件')
+        self.BUNDLE_INFO_DICT = self._load_aba_bundle()
+        if self.tree_flag == 'trunk':
+            print('[QB_MODEL]: 全包资源分析')
+            self.DOWNLOAD_FIRST_DLC = self._load_bundle_download()
+            self._set_apk_dlc_other()
             self.PACKAGE_FILE_DICT = self._load_package_file()
             self._save_package_file()
-        # aba_bundle.json
-        self.BUNDLE_INFO_DICT = self._load_aba_bundle()
-
-    def _load_file_message(self, file_path):
-        url = '%s/download/%d/artifacts/%s' % (QB_URL, self.build_id, file_path)
-        print('url: '+url)
-        req = QB_REQUESTS.get(url)
-        if req.status_code != 200:
-            logging.error(file_path + u'获取失败\nstatus_code=%d\n%s' % (req.status_code, url))
-            return ''
-
-        return req.content.decode()
+        elif self.tree_flag == 'tx_publish':
+            print('[QB_MODEL]: 更新包资源分析')
 
     def _load_build_info(self):
         print('[QB_MODEL]：获取build_svn build_time')
@@ -103,14 +85,13 @@ class QB:
     def _load_package_file(self):
         print('[QB_MODEL]：从installpacksize.txt文件获取数据--->package_file_dict')
         package_file_dict = {}
-        url = RESOURCE_URL + '/'+ str(self.build_time)+'/original/installpacksize.txt'
-        req = QB_REQUESTS.get(url)
-        if req.status_code != 200:
-            logging.error(u'installpacksize.txt 获取失败\nstatus_code=%d\n%s' % (req.status_code, url))
+        file_message = self._load_file_message(self.input_path+'/installpacksize.txt')
+        if file_message == '':
+            logging.error('[QB_MODEL]：从installpacksize.txt文件获取失败!!!')
             return package_file_dict
 
         dir_path = ''
-        for line_str in req.content.decode().split('\n'):
+        for line_str in file_message.split('\n'):
             if not line_str:
                 continue
             if re.match('^\.', line_str):
@@ -130,10 +111,10 @@ class QB:
     def _load_asset_cache(self):
         print('[QB_MODEL]：从AssetCacheData.txt文件获取数据--->asset_cache_dict')
         asset_cache_dict = {}
-        file_message = self._load_file_message(self.asset_cache_path)
+        file_message = self._load_file_message(self.input_path+'/AssetCacheData.txt')
 
-        if not file_message:
-            logging.error('Bundle DownLoad Data Message Is Null !!!')
+        if file_message == '':
+            logging.error('[QB_MODEL]：AssetCacheData.txt文件获取失败!!!')
             return asset_cache_dict
 
         data = json.loads(file_message)
@@ -146,9 +127,9 @@ class QB:
     def _load_bundle_data(self):
         print('[QB_MODEL]：从BundleData.txt文件获取数据--->apk_dlc_other')
         apk_dlc_other = {}
-        file_message = self._load_file_message(self.bundle_data_path)
-        if not file_message:
-            logging.error('Bundle Data Message Is Null !!!')
+        file_message = self._load_file_message(self.input_path+'/BundleData.txt')
+        if file_message == '':
+            logging.error('[QB_MODEL]：BundleData.txt文件获取失败!!!')
             return apk_dlc_other
 
         data = json.loads(file_message)
@@ -179,9 +160,9 @@ class QB:
     def _load_bundle_download(self):
         print('[QB_MODEL]：从BundleDownloadInfo.txt文件获取数据--->download_first_dlc')
         download_first_dlc = {}
-        file_message = self._load_file_message(self.bundle_download_path)
+        file_message = self._load_file_message(self.input_path+'/BundleDownloadInfo.txt')
         if not file_message:
-            logging.error('Bundle DownLoad Data Message Is Null !!!')
+            logging.error('[QB_MODEL]：BundleDownloadInfo.txt文件获取失败!!!')
             return download_first_dlc
 
         data = json.loads(file_message)
@@ -202,14 +183,13 @@ class QB:
     def _load_aba_bundle(self):
         print('[QB_MODEL]：从aba_bundle.json文件获取数据--->bundle_info_dict')
         bundle_info_dict = {}
-        url = RESOURCE_URL + '/%d/original/aba_bundle.json' % self.build_time
-        req = requests.get(url)
-        if req.status_code != 200:
-            logging.error(u'aba_bundle.json 获取失败\nstatus_code=%d\n%s' % (req.status_code, url))
+        file_message = self._load_file_message(self.input_path+'/aba_bundle.json')
+        if file_message == '':
+            logging.error('[QB_MODEL]：aba_bundle.json文件获取失败!!!')
             return bundle_info_dict
 
         bundle_count = 0
-        for bundle_item in req.content.decode().split('\n'):
+        for bundle_item in file_message.split('\n'):
             bundle_count = bundle_count + 1
             bundle_item = bundle_item.strip()
             if bundle_item == '':
@@ -306,3 +286,12 @@ class QB:
             d_file.write(file_info[5]+'\t'+file_info[0]+'\t'+str(round(int(file_info[1])/1024, 4)) +
                          '\t' + file_info[3] + '\t' + str(round(int(file_info[4])/1024, 2))+'\n')
         d_file.close()
+
+    @staticmethod
+    def _load_file_message(file_path):
+        if os.path.exists(file_path):
+            with codecs.open(file_path, 'r', 'utf-8') as file:
+                file_content = file.read().strip()
+            return file_content
+        else:
+            return ''

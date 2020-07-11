@@ -32,15 +32,14 @@ def get_log(path, revision, current_path=None, previous_info=None):
         info_json['logfrom_path'] = current_path
         if revision < info_json['revision']:
             continue
+        if path != current_path and info_json['copyfrom_path'] == '':
+            continue
         if previous_info is not None and previous_info['revision'] > info_json['revision']:
             return get_log(path, revision, path_dirname, previous_info)
         return get_log(path, revision, path_dirname, info_json)
     return get_log(path, revision, path_dirname, previous_info)
 
 
-# begin_time = time.time()
-# print(type(get_log('/baanches-rel/tx_publish/JX3Pocket/Assets/JX3Game/Source/Map/SL/SL_HomeTown_boss.unity', 313090)))
-# print(time.time() - begin_time)
 
 def compare_file(file1, file2, out_file):
     if not os.path.exists(file1) or not os.path.exists(file2):
@@ -84,7 +83,10 @@ def compare_file(file1, file2, out_file):
 
 if __name__ == '__main__':
 
-    file1 = r'E:\NewPackageAnalysize\dist\679477\parseFile.tab'
-    file2 = r'E:\NewPackageAnalysize\dist\679477\svn_file.tab'
-    out_file = r'E:\NewPackageAnalysize\dist\679477\result.tab'
-    compare_file(file1, file2, out_file)
+    # file1 = r'E:\NewPackageAnalysize\dist\679477\parseFile.tab'
+    # file2 = r'E:\NewPackageAnalysize\dist\679477\svn_file.tab'
+    # out_file = r'E:\NewPackageAnalysize\dist\679477\result.tab'
+    # compare_file(file1, file2, out_file)
+    begin_time = time.time()
+    print(get_log('/branches-rel/tx_publish/JX3Pocket/Assets/JX3Game/Source/weapons/XYDH_DaoJu/Materials/M_GuZhiLanPoSui_brush01_HD.mat', 681572))
+    print(time.time() - begin_time)

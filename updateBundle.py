@@ -19,21 +19,22 @@ from devide_model import redis_host, redis_password, redis_port, tx_publish_dir
 def get_svn(q_write, q_read):
     redis_client = redis.Redis(host=redis_host, password=redis_password, port=redis_port, decode_responses=True)
     while True:
-        read_info = q_read.get(timeout=60)
+        read_info = q_read.get()
+        if read_info is None:
+            break
         svn_message = get_log(redis_client, tx_publish_dir + read_info['path']['svn_path'],
                               read_info['path']['revision'])
-        if svn_message is None:
-            svn_message['file_path'] = read_info['path']['file_path']
-            svn_message['svn_path'] = read_info['path']['svn_path']
-            svn_message['author'] = 'NULL'
-            svn_message['msg'] = 'NULL'
-            svn_message['date'] = 'NULL'
-            svn_message['logfrom_path'] = 'NULL'
-            svn_message['revision'] = 'NULL'
-        else:
-            svn_message['file_path'] = read_info['path']['file_path']
-            svn_message['svn_path'] = read_info['path']['svn_path']
 
+        if svn_message is None:
+            svn_message = {
+                'author': 'NULL',
+                'msg': 'NULL',
+                'date': 'NULL',
+                'logfrom_path': 'NULL',
+                'revision': 'NULL',
+            }
+        svn_message['file_path'] = read_info['path']['file_path']
+        svn_message['svn_path'] = read_info['path']['svn_path']
         print('[子进程任务]: 获取到第' + str(read_info['index']) + '个文件')
         print('[子进程任务]: 当前检查的文件是: '+read_info['path']['svn_path'])
         q_write.put(svn_message)
@@ -62,6 +63,8 @@ def get_log(redis_client, path, revision, current_path=None, previous_info=None)
         info_json['logfrom_path'] = current_path
         if revision < info_json['revision']:
             continue
+        if path != current_path and info_json['copyfrom_path'] == '':
+            continue
         if previous_info is not None and previous_info['revision'] > info_json['revision']:
             return get_log(redis_client, path, revision, path_dir_name, previous_info)
         return get_log(redis_client, path, revision, path_dir_name, info_json)
@@ -78,13 +81,16 @@ def analysis_calc_worker(arg):
 if __name__ == '__main__':
 
     multiprocessing.freeze_support()
-
     parser = argparse.ArgumentParser()
     parser.add_argument('-B', '--baseline-buildid', help="baseline buildid", type=int, required=True)
+    parser.add_argument('-I', '--input-path', help="input_path", required=True)
     parser.add_argument('-O', '--out-path', help="out_path", required=True)
     args = parser.parse_args()
 
     status = 1
+    if args.input_path.find('\\'):
+        args.input_path = args.input_path.replace('\\', '/')
+
     if args.out_path.find('\\'):
         args.out_path = args.out_path.replace('\\', '/')
     if not os.path.exists(args.out_path):
@@ -92,7 +98,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-    Qb_Message = QB(args.baseline_buildid, 'BundleData.txt', '', 'aba_bundle.json', 'AssetCacheData.txt', args.out_path)
+    Qb_Message = QB(args.baseline_buildid, 'tx_publish', args.input_path, args.out_path)
     analysis_calc_process = multiprocessing.Process(target=analysis_calc_worker, args=(args,))
     analysis_calc_process.start()
 
@@ -138,7 +144,11 @@ if __name__ == '__main__':
     print('[主进程任务]: 写svn_file文件完成')
 
     for single_process in process_list:
+        q_select.put(None)
+
+    for single_process in process_list:
         single_process.join()
+
     analysis_calc_process.join()
     print('[主进程任务]: join完成')
     end_time = time.time()
