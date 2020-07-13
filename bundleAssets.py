@@ -117,19 +117,23 @@ if __name__ == '__main__':
         single_process.start()
 
     # 将要查询svn信息的文件写入q_select队列中
-    count = 1
+    count = 0
+    lists = []
+    print('Qb_Message.ASSET_CACHE_PATH长度：' + str(len(Qb_Message.ASSET_CACHE_PATH)))
     for bundle, bundle_value in Qb_Message.BUNDLE_INFO_DICT.items():
         file_list = bundle_value['fileList']
         for file in file_list:
             file_path = file['f']
-            if file_path == 'ABO':
+            if file_path == 'ABO' and file_path in lists:
                 continue
+
             if file_path.upper() in Qb_Message.ASSET_CACHE_PATH:
+                lists.append(file_path)
                 Qb_Message.ASSET_CACHE_PATH[file_path.upper()]['file_path'] = file['f']
                 q_select.put({'path': Qb_Message.ASSET_CACHE_PATH[file_path.upper()], 'index': count})
                 count += 1
 
-    print('[主进程任务]: 获取任务队列成功')
+    print('[主进程任务]: 获取任务队列成功 文件数共：'+str(len(lists)))
 
     # 从写队列中获取结果存入svn_file.tab中
     f_write = codecs.open(args.out_path + '/svn_file.tab', 'w', 'utf-8')
