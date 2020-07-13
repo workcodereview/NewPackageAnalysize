@@ -61,6 +61,7 @@ class QB:
             self._set_apk_dlc_other()
             self.PACKAGE_FILE_DICT = self._load_package_file()
             self._save_package_file()
+            print('Qb_Message.ASSET_CACHE_PATH长度：'+str(len(self.ASSET_CACHE_PATH)))
         elif self.tree_flag == 'tx_publish':
             print('[QB_MODEL]: 更新包资源分析')
 
@@ -230,7 +231,7 @@ class QB:
         logging.info('Save Bundle File Success!!!')
 
     def _save_file(self):
-        print('[QB_MODEL]：获取svn_file.tab file')
+        print('[QB_MODEL]：获取parseFile.tab file')
         f_write = codecs.open(self.out_path + '/parseFile.tab', 'w', 'utf-8')
         f_write.write('fileName\tfileSize\tfile_mSize\tbundleName\tbundleSize\tLoadFrom\n')
         with codecs.open(self.out_path + '/parseBundle.tab', 'r', 'utf-8') as f:
@@ -250,7 +251,7 @@ class QB:
                         lineinfo = line.split('\t')
                         if lineinfo[0] == bundle:
                             load_from = lineinfo[4]
-                    print('write success count = ' + str(file_count))
+                    # print('write success count = ' + str(file_count))
                     f_write.write(file_info['f'] + '\t' + str(file_info['ds']) + '\t' + str(file_info['s']) + '\t'
                                   + bundle + '\t' + str(bundle_message['bundlesize']) + '\t'
                                   + load_from + '\t' + '\n')
