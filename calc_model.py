@@ -119,7 +119,7 @@ class Calc:
                         continue
                     file_info = file_item.split('\t')
                     file_count = file_count + 1
-                    if file_info[1] != 'fileSize(未解压)':
+                    if file_info[1] != 'fileSize(未解压)' and file_info[1] != '文件大小(未解压)':
                         file_compress_size = file_compress_size + int(file_info[1])
                 z_file.write(k + '\t' + str(file_count) + '\t' + str(round(file_compress_size/1024/1024, 2)) + '\n')
                 if k not in APK_IPA_Filter:

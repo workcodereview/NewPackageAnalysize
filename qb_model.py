@@ -61,7 +61,6 @@ class QB:
             self._set_apk_dlc_other()
             self.PACKAGE_FILE_DICT = self._load_package_file()
             self._save_package_file()
-            print('Qb_Message.ASSET_CACHE_PATH长度：'+str(len(self.ASSET_CACHE_PATH)))
         elif self.tree_flag == 'tx_publish':
             print('[QB_MODEL]: 更新包资源分析')
 
