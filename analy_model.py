@@ -125,6 +125,7 @@ class Analysis:
                     else:
                         ret_result['is_match'] = 1
                         ret_result['module_name'] = module_name
+                    break
         if ret_result['is_match'] == 0 and package_flag == 'bundle':
             ret_result['module_name'] = u'其他/Others(bundle)'
         elif ret_result['is_match'] == 0 and package_flag == 'package':
