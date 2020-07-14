@@ -54,6 +54,7 @@ def get_svn(q_write, q_read):
         if read_info is None:
             # 推送给主进程一个None 标志svn数据写完成
             q_write.put(None)
+            print('[子进程任务]: 文件svn信息查询完成')
             break
         svn_message = get_log(redis_client, tx_publish_dir + read_info['path']['svn_path'],
                               read_info['path']['revision'])
@@ -68,7 +69,7 @@ def get_svn(q_write, q_read):
             }
         svn_message['file_path'] = read_info['path']['file_path']
         svn_message['svn_path'] = read_info['path']['svn_path']
-        print('[子进程任务]: 文件数量: ' + str(read_info['index']) + ' 文件名: '+read_info['path']['svn_path'])
+        # print('[子进程任务]: 文件数量: ' + str(read_info['index']) + ' 文件名: '+read_info['path']['svn_path'])
         q_write.put(svn_message)
 
 
@@ -89,6 +90,7 @@ def write_file(bundle_info_dict, asset_cache_path, queue_select, process_count):
     # put process_count个None 给20个子进程标志数据已推送完毕
     for i in range(process_count):
         queue_select.put(None)
+    print('[子进程任务]: 向队列填写需要查询的文件完成')
 
 
 # 保存结果到svn_file
@@ -153,6 +155,7 @@ if __name__ == '__main__':
         single_process.start()
 
     # 从写队列中获取结果存入svn_file.tab中
+    print('[主进程任务]: 开始写svn_file文件')
     f_write = codecs.open(args.out_path + '/svn_file.tab', 'w', 'utf-8')
     f_write.write('fileName\tsvn_file\tauthor\tdate\tfrom_path\tnumber_message\trevision\n')
     count = 0
@@ -165,7 +168,7 @@ if __name__ == '__main__':
                 break
             continue
         file_count += 1
-        print('[主进程任务]: 当前向svn_file存入第' + str(file_count) + '个文件')
+        # print('[主进程任务]: 当前向svn_file存入第' + str(file_count) + '个文件')
         f_write.write(q_info['file_path'] + '\t' + q_info['svn_path'] + '\t' +
                       q_info['author'] + '\t' + q_info['date'] + '\t' +
                       q_info['logfrom_path']+'\t'+q_info['msg'].strip().replace('\n', ' ') +
