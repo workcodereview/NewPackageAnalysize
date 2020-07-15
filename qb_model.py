@@ -7,7 +7,7 @@ import codecs
 import requests
 import logging
 import xml.etree.ElementTree as ET
-from devide_model import MODULE_PATH, APK_PATH, IPA_PATH, AllSource_Item, AllSource_APK, AllSource_IPA
+from devide_model import AllSource_Item, AllSource_APK, AllSource_IPA
 
 # BundleData.txt BundleDownLoad.txt build id 获取
 # aba_bundle.json 从StreamingAssets获取
@@ -48,6 +48,7 @@ class QB:
         self.out_path = out_path
         self._reload()
         self._save_bundle_file()
+        self._save_module_file()
         self._save_file()
         self._save_scene_away()
 
@@ -314,17 +315,18 @@ class QB:
         d_file.close()
 
     def _save_module_file(self):
-        print('[QB_MODEL]：获取dlc.tab file')
+        print('[QB_MODEL]：获取module.tab file')
         file_path = self.out_path + '/module.tab'
         file = codecs.open(file_path, 'w', 'utf-8')
         file.write(u'模块\t类型\t文件名\n')
         for bundle_module, bundle_file_name in AllSource_Item.items():
-            file.write(bundle_module + '\t' +'bundle' +'\t' + bundle_file_name + '\n')
+            file.write(bundle_module + '\t' + 'bundle' +'\t' + bundle_file_name + '\n')
         for apk_module, apk_file_name in AllSource_APK.items():
             file.write(apk_module + '\t' + 'apk' + '\t' + apk_file_name + '\n')
         for ios_module, ios_file_name in AllSource_IPA.items():
-            file.write(ios_module + '\t' + 'apk' + '\t' + ios_file_name + '\n')
+            file.write(ios_module + '\t' + 'ios' + '\t' + ios_file_name + '\n')
         file.close()
+        print('[QB_MODEL]：获取module.tab file success')
 
     @staticmethod
     def _load_file_message(file_path):
