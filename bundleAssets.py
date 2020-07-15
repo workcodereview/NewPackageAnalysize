@@ -106,8 +106,8 @@ def save_svn_file(queue_result, file):
 
 # 单独进程处理资源分析模块
 def analysis_calc_worker(arg):
-    package_flag = Analysis(arg.out_path + '/' + 'parseFile.tab')
-    Calc(arg.out_path, package_flag)
+    analysis_message = Analysis(arg.out_path + '/' + 'parseFile.tab', arg.out_path+'/'+'parsePackageFile.tab')
+    Calc(arg.out_path, analysis_message.flag)
     print('[子进程任务]: 分析和计算资源完成')
 
 

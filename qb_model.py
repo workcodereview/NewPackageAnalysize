@@ -251,7 +251,7 @@ class QB:
                         if lineinfo[0] == bundle:
                             load_from = lineinfo[4]
                     # print('write success count = ' + str(file_count))
-                    f_write.write(file_info['f'] + '\t' + str(file_info['ds']) + '\t' + str(file_info['s']) + '\t'
+                    f_write.write(file_info['f'] + '\t' + str(file_info['s']) + '\t' + str(file_info['ds']) + '\t'
                                   + bundle + '\t' + str(bundle_message['bundlesize']) + '\t'
                                   + load_from + '\t' + '\n')
         f_write.close()
