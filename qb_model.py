@@ -288,7 +288,7 @@ class QB:
         print('[QB_MODEL]：获取parsePackageFile.tab file')
         file_path = self.out_path + '/parsePackageFile.tab'
         p_file = codecs.open(file_path, 'w', 'utf-8')
-        p_file.write('fileName\tfileSize(未解压)\tfilesize(解压后)\n')
+        p_file.write('文件名\t文件大小(未解压)\t文件大小(解压后)\n')
         for file_path, file_list in self.PACKAGE_FILE_DICT.items():
             p_file.write(file_path.strip()+'\t'+file_list['file_compress_size']+'\t'+file_list['file_size']+'\n')
         p_file.close()

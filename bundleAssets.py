@@ -129,6 +129,10 @@ if __name__ == '__main__':
     if not os.path.exists(args.out_path):
         os.mkdir(args.out_path)
 
+    # analysis_calc_process = multiprocessing.Process(target=analysis_calc_worker, args=(args,))
+    # analysis_calc_process.start()
+    # analysis_calc_process.join()
+
     process_count = 25
     start_time = time.time()
 
@@ -168,7 +172,6 @@ if __name__ == '__main__':
                 break
             continue
         file_count += 1
-       #  print('[主进程任务]: 当前向svn_file存入第' + str(file_count) + '个文件')
         f_write.write(q_info['file_path'] + '\t' + q_info['svn_path'] + '\t' +
                       q_info['author'] + '\t' + q_info['date'] + '\t' +
                       q_info['logfrom_path'] + '\t' + q_info['msg'].strip().replace('\n', ' ') +

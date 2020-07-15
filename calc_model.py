@@ -106,6 +106,7 @@ class Calc:
             z_file.write(u'模块\t文件数\t文件大小(未解压)\t文件大小(解压后)\n')
             for k, v in self.divide.items():
                 file_path = self.out_path+'/'+v+'.tab'
+                print('[Calc_Model]：正在计算的文件' + file_path)
                 if not os.path.exists(file_path):
                     logging.error(file_path+' Not Exist!!!')
                     continue
@@ -119,9 +120,12 @@ class Calc:
                         continue
                     file_info = file_item.split('\t')
                     file_count = file_count + 1
-                    if file_info[1] != 'fileSize(未解压)' and file_info[1] != '文件大小(未解压)':
+                    if file_info[1] != '文件大小(未解压)':
                         file_compress_size = file_compress_size + int(file_info[1])
-                z_file.write(k + '\t' + str(file_count) + '\t' + str(round(file_compress_size/1024/1024, 2)) + '\n')
+                    if file_info[2] != '文件大小(解压后)':
+                        file_size = file_size + int(file_info[2])
+                z_file.write(k + '\t' + str(file_count) + '\t' + str(round(file_compress_size/1024/1024, 2)) + '\t' +
+                             str(round(file_size/1024/1024, 2)) + '\n')
                 if k not in APK_IPA_Filter:
                     w_file.write(
                         k + '\t' + str(file_count) + '\t' + str(round(file_compress_size/1024/1024, 2)) + '\t' +str(0) +
@@ -194,16 +198,16 @@ class Calc:
         for file_item in file_content:
             file_info = file_item.split('\t')
             if file_info[4] == 'Apk':
-                apk_size = apk_size + int(file_info[2])
+                apk_size = apk_size + int(file_info[1])
                 apk_count = apk_count + 1
             elif file_info[4] == 'Dlc':
-                dlc_size = dlc_size + int(file_info[2])
+                dlc_size = dlc_size + int(file_info[1])
                 dlc_count = dlc_count + 1
             elif file_info[4] == 'Unused':
-                other_size = other_size + int(file_info[2])
+                other_size = other_size + int(file_info[1])
                 other_count = other_count + 1
             elif file_info[4] == 'First':
-                first_size = first_size + int(file_info[2])
+                first_size = first_size + int(file_info[1])
                 first_count = first_count + 1
         w_file.write(
             u'apk下载大小(bundle下载量):' + str(round(apk_size / 1024 / 1024, 2)) + 'MB,bundle数目为: ' + str(apk_count) + '\n')

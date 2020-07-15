@@ -64,10 +64,9 @@ class Analysis:
             if index == 0:
                 continue
             file_info = file_item.split('\t')
-            # print('Current File index: ' + str(index - 1))
             ret = self.is_match(self.divide, file_info[0], 'package')
             if file_info[0] == 'AndroidManifest.xml':
-                print('AndroidManifest.xml'+ret['module_name'])
+                print('[Analysis_Model]: AndroidManifest.xml'+ret['module_name'])
             for key, values in self._result_divide.items():
                 module_name = ret['module_name']
                 if key != module_name:
@@ -75,8 +74,8 @@ class Analysis:
                 f_write = codecs.open(parent_path + '/' + values + '.tab', 'a+', 'utf-8')
                 if values not in values_exist:
                     values_exist[values] = True
-                    f_write.write(u'文件名\t文件大小(未解压)\n')
-                f_write.write(file_info[0]+'\t'+str(file_info[1]+'\n'))
+                    f_write.write(u'文件名\t文件大小(未解压)\t文件大小(解压后)\n')
+                f_write.write(file_info[0]+'\t'+str(file_info[1])+'\t'+str(file_info[2])+'\n')
                 f_write.close()
         logging.info('Match Package File Info Success !!!')
 
@@ -94,11 +93,17 @@ class Analysis:
                 self.divide = APK_PATH
                 self._result_divide = AllSource_APK
                 self.flag = 'apk'
-            elif file_info[0].strip() == 'appsize_list.txt':
+            elif 'Payload/' in file_info[0]:
                 print('[Analysis_Model]: IPA文件')
                 self.divide = IPA_PATH
                 self._result_divide = AllSource_IPA
                 self.flag = 'ipa'
+            else:
+                print('[Analysis_Model]: self.divide 划分错误')
+                self.divide = 'Null'
+                self._result_divide = {}
+                self.flag = 'NUll'
+            break
 
     @staticmethod
     def is_match(module_path, file_path, package_flag):
