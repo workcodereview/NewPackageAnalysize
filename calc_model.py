@@ -70,8 +70,8 @@ class Calc:
                     continue
                 file_info = file_item.split('\t')
                 file_count = file_count + 1
-                if file_info[1] != '文件大小(在bundle中的大小)':
-                    file_size = file_size + int(file_info[1])
+                if file_info[2] != '文件大小(在bundle中的大小)':
+                    file_size = file_size + int(file_info[2])
                 if bundle_name != file_info[3]:
                     bundle_name = file_info[3]
                     if bundle_name not in bundle_list:
@@ -82,16 +82,16 @@ class Calc:
                         bundle_count = bundle_count + 1
                 if file_info[5] == 'Apk':
                     apk_count = apk_count + 1
-                    apk_size = apk_size + int(file_info[1])
+                    apk_size = apk_size + int(file_info[2])
                 elif file_info[5] == 'Dlc':
                     dlc_count = dlc_count + 1
-                    dlc_size = dlc_size + + int(file_info[1])
+                    dlc_size = dlc_size + + int(file_info[2])
                 elif file_info[5] == 'Unused':
                     other_count = other_count + 1
-                    other_size = other_size + int(file_info[1])
+                    other_size = other_size + int(file_info[2])
                 elif file_info[5] == 'First':
                     first_count = first_count + 1
-                    first_size = first_size + int(file_info[1])
+                    first_size = first_size + int(file_info[2])
 
             w_file.write(k + '\t' + str(apk_count) + '\t' + str(round(apk_size/1024/1024, 2)) +
                          '\t' + str(first_count) + '\t' + str(round(first_size/1024/1024, 2)) +
@@ -103,7 +103,7 @@ class Calc:
         # 匹配分析
         if self.divide:
             z_file = codecs.open(self.out_path + self.title2, 'w', 'utf-8')
-            z_file.write(u'模块\t文件数\t文件大小(解压后)\n')
+            z_file.write(u'模块\t文件数\t文件大小(未解压)\t文件大小(解压后)\n')
             for k, v in self.divide.items():
                 file_path = self.out_path+'/'+v+'.tab'
                 if not os.path.exists(file_path):
@@ -155,8 +155,8 @@ class Calc:
                         continue
                     file_count = file_count + 1
                     file_info = file_item.split('\t')
-                    if file_info[1] != '文件大小(在bundle中的大小)':
-                        file_size = file_size + int(file_info[1])
+                    if file_info[2] != '文件大小(在bundle中的大小)':
+                        file_size = file_size + int(file_info[2])
                     if len(file_info) > 2:
                         if file_info[3] != bundle_name:
                             bundle_name = file_info[3]
@@ -194,16 +194,16 @@ class Calc:
         for file_item in file_content:
             file_info = file_item.split('\t')
             if file_info[4] == 'Apk':
-                apk_size = apk_size + int(file_info[1])
+                apk_size = apk_size + int(file_info[2])
                 apk_count = apk_count + 1
             elif file_info[4] == 'Dlc':
-                dlc_size = dlc_size + int(file_info[1])
+                dlc_size = dlc_size + int(file_info[2])
                 dlc_count = dlc_count + 1
             elif file_info[4] == 'Unused':
-                other_size = other_size + int(file_info[1])
+                other_size = other_size + int(file_info[2])
                 other_count = other_count + 1
             elif file_info[4] == 'First':
-                first_size = first_size + int(file_info[1])
+                first_size = first_size + int(file_info[2])
                 first_count = first_count + 1
         w_file.write(
             u'apk下载大小(bundle下载量):' + str(round(apk_size / 1024 / 1024, 2)) + 'MB,bundle数目为: ' + str(apk_count) + '\n')

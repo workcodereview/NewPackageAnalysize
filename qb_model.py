@@ -7,6 +7,7 @@ import codecs
 import requests
 import logging
 import xml.etree.ElementTree as ET
+from devide_model import MODULE_PATH, APK_PATH, IPA_PATH, AllSource_Item, AllSource_APK, AllSource_IPA
 
 # BundleData.txt BundleDownLoad.txt build id 获取
 # aba_bundle.json 从StreamingAssets获取
@@ -59,7 +60,8 @@ class QB:
             print('[QB_MODEL]: 全包资源分析')
             self.DOWNLOAD_FIRST_DLC = self._load_bundle_download()
             self._set_apk_dlc_other()
-            self.PACKAGE_FILE_DICT = self._load_package_file()
+            # self.PACKAGE_FILE_DICT = self._load_package_file()
+            self.PACKAGE_FILE_DICT = self._load_package_file1()
             self._save_package_file()
         elif self.tree_flag == 'tx_publish':
             print('[QB_MODEL]: 更新包资源分析')
@@ -105,6 +107,30 @@ class QB:
                     file_path = dir_path + '/' + line_data[length - 1]
                 package_file_dict[file_path] = {'file_path': file_path, 'file_size': line_data[4]}
 
+        return package_file_dict
+
+    def _load_package_file1(self):
+        print('[QB_MODEL]：ziplistfiles.txt文件获取数据--->package_file_dict')
+        package_file_dict = {}
+        file_message = self._load_file_message(self.input_path + '/ziplistfiles.txt')
+        if file_message == '':
+            logging.error('[QB_MODEL]：从installpacksize.txt文件获取失败!!!')
+            return package_file_dict
+
+        file_count = 0
+        for file_item in file_message.splitlines():
+            file_count += 1
+            if file_count <= 3:
+                continue
+            if re.match(r'^-', file_item):
+                # print(str(file_item))
+                break
+            file_info = re.sub(' +', '\t', file_item.strip())
+            file_split = file_info.split('\t')
+            file_length = len(file_split)
+            if not file_split[file_length - 1].endswith('/'):
+                package_file_dict[file_split[file_length - 1]] = {'file_size': file_split[0],
+                                                                  'file_compress_size': file_split[2]}
         return package_file_dict
 
     # self.ASSET_CACHE_PATH = {'svn_path': file, 'file_lists': [file], 'revision': self.build_svn}
@@ -261,9 +287,9 @@ class QB:
         print('[QB_MODEL]：获取parsePackageFile.tab file')
         file_path = self.out_path + '/parsePackageFile.tab'
         p_file = codecs.open(file_path, 'w', 'utf-8')
-        p_file.write('fileName\tfileSize(未解压)\n')
+        p_file.write('fileName\tfileSize(未解压)\tfilesize(解压后)\n')
         for file_path, file_list in self.PACKAGE_FILE_DICT.items():
-            p_file.write(file_list['file_path'].strip()+'\t'+file_list['file_size'].strip()+'\n')
+            p_file.write(file_path.strip()+'\t'+file_list['file_compress_size']+'\t'+file_list['file_size']+'\n')
         p_file.close()
 
     def _save_scene_away(self):
@@ -286,6 +312,19 @@ class QB:
             d_file.write(file_info[5]+'\t'+file_info[0]+'\t'+str(round(int(file_info[1])/1024, 4)) +
                          '\t' + file_info[3] + '\t' + str(round(int(file_info[4])/1024, 2))+'\n')
         d_file.close()
+
+    def _save_module_file(self):
+        print('[QB_MODEL]：获取dlc.tab file')
+        file_path = self.out_path + '/module.tab'
+        file = codecs.open(file_path, 'w', 'utf-8')
+        file.write(u'模块\t类型\t文件名\n')
+        for bundle_module, bundle_file_name in AllSource_Item.items():
+            file.write(bundle_module + '\t' +'bundle' +'\t' + bundle_file_name + '\n')
+        for apk_module, apk_file_name in AllSource_APK.items():
+            file.write(apk_module + '\t' + 'apk' + '\t' + apk_file_name + '\n')
+        for ios_module, ios_file_name in AllSource_IPA.items():
+            file.write(ios_module + '\t' + 'apk' + '\t' + ios_file_name + '\n')
+        file.close()
 
     @staticmethod
     def _load_file_message(file_path):

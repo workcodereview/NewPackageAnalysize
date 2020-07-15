@@ -46,7 +46,7 @@ class Analysis:
                 f_write = codecs.open(parent_path + '/' + values + '.tab', 'a+', 'utf-8')
                 if values not in values_exist:
                     values_exist[values] = True
-                    f_write.write(u'文件名\t文件大小(在bundle中的大小)\t文件运行时大小\tbundle名\tbundle大小\t下载方式\n')
+                    f_write.write(u'文件名\t文件大小\t文件大小(在bundle中的大小)\tbundle名\tbundle大小\t下载方式\n')
                 f_write.write(
                     file_info[0] + '\t' + str(file_info[1]) + '\t' + str(file_info[2]) + '\t' + file_info[
                         3] + '\t' + str(file_info[4]) + '\t' + file_info[5] + '\n')
