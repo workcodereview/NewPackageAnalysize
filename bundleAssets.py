@@ -17,14 +17,17 @@ from devide_model import redis_host, redis_password, redis_port, trunk_dir
 
 
 def get_log(redis_client, path, revision, current_path=None, previous_info=None):
+
     if current_path is None:
         path = path.replace('\\', '/')
         current_path = path
     path_dir_name = os.path.dirname(current_path)
     if current_path == '/':
         if previous_info is not None and previous_info['copyfrom_path']:
-            from_path = os.path.join(previous_info['copyfrom_path'],
-                                     os.path.relpath(path, previous_info['logfrom_path']))
+            relpath = os.path.relpath(path, previous_info['logfrom_path'])
+            if relpath == '.':
+                return previous_info
+            from_path = os.path.join(previous_info['copyfrom_path'], relpath)
             from_revision = int(previous_info['copyfrom_rev'])
             return get_log(redis_client, from_path, from_revision)
         return previous_info
@@ -47,7 +50,7 @@ def get_log(redis_client, path, revision, current_path=None, previous_info=None)
     return get_log(redis_client, path, revision, path_dir_name, previous_info)
 
 
-def get_svn(q_write, q_read):
+def get_svn(q_write, q_read, index):
     redis_client = redis.Redis(host=redis_host, password=redis_password, port=redis_port, decode_responses=True)
     while True:
         read_info = q_read.get()
@@ -56,6 +59,7 @@ def get_svn(q_write, q_read):
             q_write.put(None)
             print('[子进程任务]: 文件svn信息查询完成')
             break
+        # print('[子进程任务-'+str(index)+']: path = '+str(trunk_dir + read_info['path']['svn_path']))
         svn_message = get_log(redis_client, trunk_dir + read_info['path']['svn_path'],
                               read_info['path']['revision'])
 
@@ -75,6 +79,7 @@ def get_svn(q_write, q_read):
 
 # write_file_process 进程 ----> 向q_select队列写数据
 def write_file(bundle_info_dict, asset_cache_path, queue_select, process_count):
+    print('[子进程任务]: process_count = ' + str(process_count))
     file_count = 1
     for bundle, bundle_value in bundle_info_dict.items():
         file_list = bundle_value['fileList']
@@ -89,6 +94,7 @@ def write_file(bundle_info_dict, asset_cache_path, queue_select, process_count):
 
     # put process_count个None 给20个子进程标志数据已推送完毕
     for i in range(process_count):
+        print('[子进程任务]: 向队列填入第'+str(i)+'个None值')
         queue_select.put(None)
     print('[子进程任务]: 向队列填写需要查询的文件完成')
 
@@ -129,15 +135,12 @@ if __name__ == '__main__':
     if not os.path.exists(args.out_path):
         os.mkdir(args.out_path)
 
-    # analysis_calc_process = multiprocessing.Process(target=analysis_calc_worker, args=(args,))
-    # analysis_calc_process.start()
-    # analysis_calc_process.join()
-
     process_count = 25
     start_time = time.time()
 
     Qb_Message = QB(args.baseline_buildid, 'trunk', args.input_path,  args.out_path)
     analysis_calc_process = multiprocessing.Process(target=analysis_calc_worker, args=(args,))
+    analysis_calc_process.daemon = True
     analysis_calc_process.start()
 
     # 查询队列
@@ -149,12 +152,17 @@ if __name__ == '__main__':
     write_file_process = multiprocessing.Process(target=write_file, args=(Qb_Message.BUNDLE_INFO_DICT,
                                                                           Qb_Message.ASSET_CACHE_PATH, q_select,
                                                                           process_count,))
+    write_file_process.daemon = True
     write_file_process.start()
 
     # 开启20个进程从q_select队列中获取要查询svn信息的文件 并将结果写入q_write队列中
     process_list = []
     for i in range(process_count):
-        process_list.append(multiprocessing.Process(target=get_svn, args=(q_result, q_select)))
+        process_list.append(multiprocessing.Process(target=get_svn, args=(q_result, q_select, i)))
+
+    for process in process_list:
+        process.daemon = True
+
     for single_process in process_list:
         single_process.start()
 
@@ -168,6 +176,7 @@ if __name__ == '__main__':
         q_info = q_result.get()
         if q_info is None:
             count += 1
+            print('[主进程任务]: 当前第'+str(count)+'个子进程结束')
             if process_count == count:
                 break
             continue

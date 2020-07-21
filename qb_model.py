@@ -7,7 +7,7 @@ import codecs
 import requests
 import logging
 import xml.etree.ElementTree as ET
-from devide_model import AllSource_Item, AllSource_APK, AllSource_IPA
+from devide_model import AllSource_Item, AllSource_APK, AllSource_IPA, APK_IPA_Filter
 
 # BundleData.txt BundleDownLoad.txt build id 获取
 # aba_bundle.json 从StreamingAssets获取
@@ -322,9 +322,11 @@ class QB:
         for bundle_module, bundle_file_name in AllSource_Item.items():
             file.write(bundle_module + '\t' + 'bundle' +'\t' + bundle_file_name + '\n')
         for apk_module, apk_file_name in AllSource_APK.items():
-            file.write(apk_module + '\t' + 'apk' + '\t' + apk_file_name + '\n')
+            if apk_module not in APK_IPA_Filter:
+                file.write(apk_module + '\t' + 'apk' + '\t' + apk_file_name + '\n')
         for ios_module, ios_file_name in AllSource_IPA.items():
-            file.write(ios_module + '\t' + 'ios' + '\t' + ios_file_name + '\n')
+            if ios_module not in APK_IPA_Filter:
+                file.write(ios_module + '\t' + 'ios' + '\t' + ios_file_name + '\n')
         file.close()
         print('[QB_MODEL]：获取module.tab file success')
 

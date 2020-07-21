@@ -17,14 +17,17 @@ from devide_model import redis_host, redis_password, redis_port, tx_publish_dir
 
 
 def get_log(redis_client, path, revision, current_path=None, previous_info=None):
+
     if current_path is None:
         path = path.replace('\\', '/')
         current_path = path
     path_dir_name = os.path.dirname(current_path)
     if current_path == '/':
         if previous_info is not None and previous_info['copyfrom_path']:
-            from_path = os.path.join(previous_info['copyfrom_path'],
-                                     os.path.relpath(path, previous_info['logfrom_path']))
+            relpath = os.path.relpath(path, previous_info['logfrom_path'])
+            if relpath == '.':
+                return previous_info
+            from_path = os.path.join(previous_info['copyfrom_path'], relpath)
             from_revision = int(previous_info['copyfrom_rev'])
             return get_log(redis_client, from_path, from_revision)
         return previous_info
@@ -89,6 +92,7 @@ def write_file(bundle_info_dict, asset_cache_path, queue_select, process_count):
 
     # put process_count个None 给20个子进程标志数据已推送完毕
     for i in range(process_count):
+        print('[子进程任务]: 向队列填入第' + str(i) + '个None值')
         queue_select.put(None)
     print('[子进程任务]: 向队列填写需要查询的文件完成')
 
@@ -164,6 +168,7 @@ if __name__ == '__main__':
         q_info = q_result.get()
         if q_info is None:
             count += 1
+            print('[主进程任务]: count = ' + str(count))
             if process_count == count:
                 break
             continue
