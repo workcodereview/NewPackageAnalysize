@@ -2,6 +2,7 @@ before_script:
 
 stages:
   - build
+  - package
 
 build-mac:
   stage: build
@@ -20,9 +21,6 @@ build-mac:
     - pyinstaller -F updateBundle.py -p /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages
     - dist/updateBundle -h
     - cp dist/updateBundle bin/mac/updateBundle
-  artifacts:
-    paths:
-      - bin
 
 build-windows:
   stage: build
@@ -40,7 +38,17 @@ build-windows:
     - pyinstaller -F updateBundle.py -p E:\NewPackageAnalysize\venv\Lib\site-packages
     - dist/updateBundle.exe -h
     - cp dist/updateBundle.exe bin/windows/updateBundle.exe
+
+package:
+  stage: package
+  tags:
+    - python windows
+  only:
+    - master
+  script:
+
   artifacts:
     paths:
-      - bin
+      - bin/mac
+      - bin/windows
 
