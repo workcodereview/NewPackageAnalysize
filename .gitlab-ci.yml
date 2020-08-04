@@ -3,7 +3,7 @@ before_script:
 stages:
   - build
   - package
-  - check
+  - run
 
 build-mac:
   stage: build
@@ -61,15 +61,30 @@ package:
     paths:
       - bin
 
-check-a:
+run-bundleAssets:
   stage: check
   tags:
     - python windows
   only:
     - master
   script:
-    - ./bin/windows/bundleAssets.exe -B 1139144 -I ./data/f688822 -O ./out/a
+    - mkdir -p out/bundleAssets
+    - ./bin/windows/bundleAssets.exe -B 1139144 -I ./data/f688822 -O ./out/bundleAssets
   artifacts:
-    name: all
+    name: bundleAssetsOut
     paths:
-      - out/a
+      - out/bundleAssets
+
+run-updateBundle:
+  stage: check
+  tags:
+    - python windows
+  only:
+    - master
+  script:
+    - mkdir -p out/updateBundle
+    - ./bin/windows/updateBundle.exe -B 1139362 -I ./data/u688923 -O ./out/updateBundle
+  artifacts:
+    name: updateBundleOut
+    paths:
+      - out/updateBundle
