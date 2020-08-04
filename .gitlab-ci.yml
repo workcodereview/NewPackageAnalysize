@@ -21,6 +21,10 @@ build-mac:
     - pyinstaller -F updateBundle.py -p /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages
     - dist/updateBundle -h
     - cp dist/updateBundle bin/mac/updateBundle
+  artifacts:
+    name: mac
+    paths:
+      - bin/mac
 
 build-windows:
   stage: build
@@ -38,6 +42,10 @@ build-windows:
     - pyinstaller -F updateBundle.py -p E:\NewPackageAnalysize\venv\Lib\site-packages
     - dist/updateBundle.exe -h
     - cp dist/updateBundle.exe bin/windows/updateBundle.exe
+  artifacts:
+    name: windows
+    paths:
+      - bin/windows
 
 package:
   stage: package
@@ -48,6 +56,7 @@ package:
   script:
     - mkdir -p bin/test
   artifacts:
+    name: all
     paths:
       - bin/mac
       - bin/windows
