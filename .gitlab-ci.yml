@@ -61,20 +61,6 @@ package:
     paths:
       - bin
 
-run-bundleAssets:
-  stage: run
-  tags:
-    - python windows
-  only:
-    - master
-  script:
-    - mkdir -p out/bundleAssets
-    - ./bin/windows/bundleAssets.exe -B 1139144 -I ./data/f688822 -O ./out/bundleAssets
-  artifacts:
-    name: bundleAssetsOut
-    paths:
-      - out/bundleAssets
-
 run-updateBundle:
   stage: run
   tags:
@@ -88,3 +74,17 @@ run-updateBundle:
     name: updateBundleOut
     paths:
       - out/updateBundle
+
+run-bundleAssets:
+  stage: run
+  tags:
+    - python windows
+  only:
+    - master
+  script:
+    - mkdir -p out/bundleAssets
+    - ./bin/windows/bundleAssets.exe -B 1139144 -I ./data/f688822 -O ./out/bundleAssets
+  artifacts:
+    name: bundleAssetsOut
+    paths:
+      - out/bundleAssets
