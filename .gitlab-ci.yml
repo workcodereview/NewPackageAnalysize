@@ -1,0 +1,61 @@
+before_script:
+
+stages:
+  - build
+  - package
+
+build-mac:
+  stage: build
+  tags:
+    - python mac
+  only:
+    - master
+  script:
+    - source ~/.bashrc
+    - mkdir -p bin/mac
+
+    - pyinstaller -F bundleAssets.py -p /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages
+    - dist/bundleAssets -h
+    - cp dist/bundleAssets bin/mac/bundleAssets
+    
+    - pyinstaller -F updateBundle.py -p /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages
+    - dist/updateBundle -h
+    - cp dist/updateBundle bin/mac/updateBundle
+  artifacts:
+    name: mac
+    paths:
+      - bin/mac
+
+build-windows:
+  stage: build
+  tags:
+    - python windows
+  only:
+    - master
+  script:
+    - mkdir -p bin/windows
+
+    - pyinstaller -F bundleAssets.py -p E:\NewPackageAnalysize\venv\Lib\site-packages
+    - dist/bundleAssets.exe -h
+    - cp dist/bundleAssets.exe bin/windows/bundleAssets.exe
+    
+    - pyinstaller -F updateBundle.py -p E:\NewPackageAnalysize\venv\Lib\site-packages
+    - dist/updateBundle.exe -h
+    - cp dist/updateBundle.exe bin/windows/updateBundle.exe
+  artifacts:
+    name: windows
+    paths:
+      - bin/windows
+
+package:
+  stage: package
+  tags:
+    - python windows
+  only:
+    - master
+  script:
+    - ls bin
+  artifacts:
+    name: all
+    paths:
+      - bin
