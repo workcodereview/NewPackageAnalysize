@@ -46,7 +46,7 @@ package:
   only:
     - master
   script:
-    - ls bin
+    - dir bin
   artifacts:
     paths:
       - bin/mac
