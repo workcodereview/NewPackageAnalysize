@@ -46,7 +46,7 @@ package:
   only:
     - master
   script:
-    - 
+    - mkdir -p bin/test
   artifacts:
     paths:
       - bin/mac
