@@ -34,11 +34,11 @@ build-windows:
     - mkdir -p bin/windows
 
     - pyinstaller -F bundleAssets.py -p E:\NewPackageAnalysize\venv\Lib\site-packages
-    - dist/bundleAssets -h
+    - dist/bundleAssets.exe -h
     - cp dist/bundleAssets.exe bin/windows/bundleAssets.exe
     
     - pyinstaller -F updateBundle.py -p E:\NewPackageAnalysize\venv\Lib\site-packages
-    - dist/updateBundle -h
+    - dist/updateBundle.exe -h
     - cp dist/updateBundle.exe bin/windows/updateBundle.exe
   artifacts:
     paths:
