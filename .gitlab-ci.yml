@@ -3,6 +3,7 @@ before_script:
 stages:
   - build
   - package
+  - check
 
 build-mac:
   stage: build
@@ -59,3 +60,16 @@ package:
     name: all
     paths:
       - bin
+
+check-a:
+  stage: check
+  tags:
+    - python windows
+  only:
+    - master
+  script:
+    - ./bin/windows/bundleAssets.exe -B 1139144 -I ./data/f688822 -O ./out/a
+  artifacts:
+    name: all
+    paths:
+      - out/a
