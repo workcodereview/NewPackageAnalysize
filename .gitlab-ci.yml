@@ -54,10 +54,8 @@ package:
   only:
     - master
   script:
-    - mkdir -p bin/test
+    - ls bin
   artifacts:
     name: all
     paths:
-      - bin/mac
-      - bin/windows
-
+      - bin
