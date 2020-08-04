@@ -62,7 +62,7 @@ package:
       - bin
 
 run-bundleAssets:
-  stage: check
+  stage: run
   tags:
     - python windows
   only:
@@ -76,7 +76,7 @@ run-bundleAssets:
       - out/bundleAssets
 
 run-updateBundle:
-  stage: check
+  stage: run
   tags:
     - python windows
   only:
