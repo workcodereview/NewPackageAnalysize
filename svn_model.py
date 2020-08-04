@@ -130,17 +130,20 @@ class SVN:
                 result['revision'] = tb_doc[0]
                 result['author'] = tb_doc[1]
 
-    def last_submit(self, path, revision):
+    def last_submit(self, path):
         # print('[SVN MODEL]: svn info last submit')
         doc = self.log(path)
-        svn_message = {}
         if doc:
-            for key, value in enumerate(doc):
-                if int(value['revision']) <= revision:
-                    svn_message = value
-                else:
-                    break
-        return svn_message
+           return doc[0]
+
+        # svn_message = {}
+        # if doc:
+        #     for key, value in enumerate(doc):
+        #         if int(value['revision']) <= revision:
+        #             svn_message = value
+        #         else:
+        #             break
+        # return svn_message
 
     @staticmethod
     def _get_cmd_message(cmd):

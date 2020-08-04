@@ -173,10 +173,16 @@ if __name__ == '__main__':
                 break
             continue
         file_count += 1
+        message = q_info['msg'].strip()
+
+        if '\n' in message:
+            message = message.replace('\n', ' ')
+        if '\t' in message:
+            message = message.replace('\t', ' ')
         # print('[主进程任务]: 当前向svn_file存入第' + str(file_count) + '个文件')
         f_write.write(q_info['file_path'] + '\t' + q_info['svn_path'] + '\t' +
                       q_info['author'] + '\t' + q_info['date'] + '\t' +
-                      q_info['logfrom_path']+'\t'+q_info['msg'].strip().replace('\n', ' ') +
+                      q_info['logfrom_path']+'\t'+message +
                       '\t' + str(q_info['revision']) + '\n')
     f_write.close()
     print('[主进程任务]: 写svn_file文件完成')

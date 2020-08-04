@@ -3,7 +3,7 @@
 import os
 import codecs
 import logging
-from devide_model import AllSource_Item, AllSource_APK , AllSource_IPA, APK_IPA_Filter, Bundle_Name
+from devide_model import AllSource_Item, AllSource_APK, AllSource_IPA, APK_IPA_Filter, Bundle_Name
 
 
 # 计算结果
