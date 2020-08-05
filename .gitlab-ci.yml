@@ -54,6 +54,7 @@ package:
     - python windows
   only:
     - master
+  needs: ["build-mac", "build-windows"]
   script:
     - ls bin
   artifacts:
@@ -67,6 +68,7 @@ run-updateBundle:
     - python windows
   only:
     - master
+  needs: ["build-windows"]
   script:
     - mkdir -p out/updateBundle
     - ./bin/windows/updateBundle.exe -B 1139362 -I ./data/u688923 -O ./out/updateBundle
@@ -81,6 +83,7 @@ run-bundleAssets:
     - python windows
   only:
     - master
+  needs: ["build-windows"]
   script:
     - mkdir -p out/bundleAssets
     - ./bin/windows/bundleAssets.exe -B 1139144 -I ./data/f688822 -O ./out/bundleAssets
