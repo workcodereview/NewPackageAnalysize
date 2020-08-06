@@ -29,6 +29,7 @@ build-linux:
     name: linux
     paths:
       - bin/linux
+  when: manual
 
 build-mac:
   stage: build
@@ -51,6 +52,7 @@ build-mac:
     name: mac
     paths:
       - bin/mac
+  when: manual
 
 build-windows:
   stage: build
@@ -59,6 +61,7 @@ build-windows:
   only:
     - master
   script:
+    - $env:path
     - mkdir -p bin/windows
 
     - pip install redis
