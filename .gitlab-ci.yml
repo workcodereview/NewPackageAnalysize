@@ -51,7 +51,6 @@ build-mac:
     name: mac
     paths:
       - bin/mac
-  when: manual
 
 build-windows:
   stage: build
@@ -73,7 +72,6 @@ build-windows:
     name: windows
     paths:
       - bin/windows
-  when: manual
 
 package:
   stage: package
@@ -81,7 +79,7 @@ package:
     - python windows
   only:
     - master
-  needs: ["build-mac", "build-windows"]
+  needs: ["build-linux", "build-mac", "build-windows"]
   script:
     - ls bin
   artifacts:
