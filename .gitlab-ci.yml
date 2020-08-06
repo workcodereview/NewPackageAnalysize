@@ -76,7 +76,7 @@ build-windows:
 package:
   stage: package
   tags:
-    - python windows
+    - centos8 python3
   only:
     - master
   needs: ["build-linux", "build-mac", "build-windows"]
