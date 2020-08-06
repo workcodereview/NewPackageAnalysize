@@ -5,6 +5,31 @@ stages:
   - package
   - run
 
+build-linux:
+  stage: build
+  tags:
+    - centos8 python3
+  only:
+    - master
+  script:
+    - mkdir -p bin/linux
+
+    - pip install redis
+    - pip install requests
+    - pip install elementpath
+
+    - pyinstaller -F bundleAssets.py
+    - dist/bundleAssets -h
+    - cp dist/bundleAssets bin/linux/bundleAssets
+    
+    - pyinstaller -F updateBundle.py
+    - dist/updateBundle -h
+    - cp dist/updateBundle bin/linux/updateBundle
+  artifacts:
+    name: linux
+    paths:
+      - bin/linux
+
 build-mac:
   stage: build
   tags:
@@ -26,6 +51,7 @@ build-mac:
     name: mac
     paths:
       - bin/mac
+  when: manual
 
 build-windows:
   stage: build
@@ -47,6 +73,7 @@ build-windows:
     name: windows
     paths:
       - bin/windows
+  when: manual
 
 package:
   stage: package
