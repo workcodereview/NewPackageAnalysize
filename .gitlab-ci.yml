@@ -55,7 +55,7 @@ build-mac:
 build-windows:
   stage: build
   tags:
-    - python windows
+    - windows10 python3
   only:
     - master
   script:
