@@ -61,11 +61,15 @@ build-windows:
   script:
     - mkdir -p bin/windows
 
-    - pyinstaller -F bundleAssets.py -p E:\NewPackageAnalysize\venv\Lib\site-packages
+    - pip install redis
+    - pip install requests
+    - pip install elementpath
+
+    - pyinstaller -F bundleAssets.py
     - dist/bundleAssets.exe -h
     - cp dist/bundleAssets.exe bin/windows/bundleAssets.exe
     
-    - pyinstaller -F updateBundle.py -p E:\NewPackageAnalysize\venv\Lib\site-packages
+    - pyinstaller -F updateBundle.py
     - dist/updateBundle.exe -h
     - cp dist/updateBundle.exe bin/windows/updateBundle.exe
   artifacts:
