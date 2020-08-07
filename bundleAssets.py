@@ -87,7 +87,8 @@ def write_file(bundle_info_dict, asset_cache_path, queue_select, process_count):
             file_path = file['f']
             if file_path == 'ABO':
                 continue
-            if file_path.upper() in asset_cache_path:
+
+            if file_path.upper() in asset_cache_path or (file_path.endswith('.wem') or file_path.endswith('.bnk')):
                 asset_cache_path[file_path.upper()]['file_path'] = file['f']
                 queue_select.put({'path': asset_cache_path[file_path.upper()], 'index': file_count})
                 file_count += 1
