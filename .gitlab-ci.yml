@@ -3,6 +3,32 @@ before_script:
 stages:
   - build
   - package
+  - run
+
+build-linux:
+  stage: build
+  tags:
+    - centos8 python3
+  only:
+    - master
+  script:
+    - mkdir -p bin/linux
+
+    - pip install redis
+    - pip install requests
+    - pip install elementpath
+
+    - pyinstaller -F bundleAssets.py
+    - dist/bundleAssets -h
+    - cp dist/bundleAssets bin/linux/bundleAssets
+    
+    - pyinstaller -F updateBundle.py
+    - dist/updateBundle -h
+    - cp dist/updateBundle bin/linux/updateBundle
+  artifacts:
+    name: linux
+    paths:
+      - bin/linux
 
 build-mac:
   stage: build
@@ -29,17 +55,21 @@ build-mac:
 build-windows:
   stage: build
   tags:
-    - python windows
+    - windows10 python3
   only:
     - master
   script:
     - mkdir -p bin/windows
 
-    - pyinstaller -F bundleAssets.py -p E:\NewPackageAnalysize\venv\Lib\site-packages
+    - pip install redis
+    - pip install requests
+    - pip install elementpath
+
+    - pyinstaller -F bundleAssets.py
     - dist/bundleAssets.exe -h
     - cp dist/bundleAssets.exe bin/windows/bundleAssets.exe
     
-    - pyinstaller -F updateBundle.py -p E:\NewPackageAnalysize\venv\Lib\site-packages
+    - pyinstaller -F updateBundle.py
     - dist/updateBundle.exe -h
     - cp dist/updateBundle.exe bin/windows/updateBundle.exe
   artifacts:
@@ -50,12 +80,43 @@ build-windows:
 package:
   stage: package
   tags:
-    - python windows
+    - centos8 python3
   only:
     - master
+  needs: ["build-linux", "build-mac", "build-windows"]
   script:
     - ls bin
   artifacts:
     name: all
     paths:
       - bin
+
+run-updateBundle:
+  stage: run
+  tags:
+    - python windows
+  only:
+    - master
+  needs: ["build-windows"]
+  script:
+    - mkdir -p out/updateBundle
+    - ./bin/windows/updateBundle.exe -B 1139362 -I ./data/u688923 -O ./out/updateBundle
+  artifacts:
+    name: updateBundleOut
+    paths:
+      - out/updateBundle
+
+run-bundleAssets:
+  stage: run
+  tags:
+    - python windows
+  only:
+    - master
+  needs: ["build-windows"]
+  script:
+    - mkdir -p out/bundleAssets
+    - ./bin/windows/bundleAssets.exe -B 1139144 -I ./data/f688822 -O ./out/bundleAssets
+  artifacts:
+    name: bundleAssetsOut
+    paths:
+      - out/bundleAssets
