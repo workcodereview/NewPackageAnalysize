@@ -359,7 +359,11 @@ class QB:
     def _change_audio_path(file_path):
         path = ''
         if file_path.endswith('.wem') or file_path.endswith('.bnk'):
-            path = file_path.replace('Assets/StreamingAssets/Audio/GeneratedSoundBanks/Android/',
-                                          'Assets/StreamingAssets/Audio/')
+            if 'Android' in file_path:
+                path = file_path.replace('Assets/StreamingAssets/Audio/GeneratedSoundBanks/Android/',
+                                         'Assets/StreamingAssets/Audio/')
+            elif 'iOS' in file_path:
+                path = file_path.replace('Assets/StreamingAssets/Audio/GeneratedSoundBanks/iOS/',
+                                         'Assets/StreamingAssets/Audio/')
         return path
 

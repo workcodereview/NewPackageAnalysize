@@ -91,7 +91,7 @@ package:
     paths:
       - bin
 
-run-updateBundle:
+run-Android-updateBundle:
   stage: run
   tags:
     - python windows
@@ -99,14 +99,14 @@ run-updateBundle:
     - master
   needs: ["build-windows"]
   script:
-    - mkdir -p out/updateBundle
-    - ./bin/windows/updateBundle.exe -B 1139362 -I ./data/u688923 -O ./out/updateBundle
+    - mkdir -p out/updateBundleAndroid
+    - ./bin/windows/updateBundle.exe -B 1141685 -I ./data/ua690292 -O ./out/updateBundleAndroid
   artifacts:
-    name: updateBundleOut
+    name: updateBundleOutAndroid
     paths:
-      - out/updateBundle
+      - out/updateBundleAndroid
 
-run-bundleAssets:
+run-iOS-updateBundle:
   stage: run
   tags:
     - python windows
@@ -114,9 +114,53 @@ run-bundleAssets:
     - master
   needs: ["build-windows"]
   script:
-    - mkdir -p out/bundleAssets
-    - ./bin/windows/bundleAssets.exe -B 1139144 -I ./data/f688822 -O ./out/bundleAssets
+    - mkdir -p out/updateBundleiOS
+    - ./bin/windows/updateBundle.exe -B 1141715 -I ./data/ui690319 -O ./out/updateBundleiOS
   artifacts:
-    name: bundleAssetsOut
+    name: updateBundleOutiOS
     paths:
-      - out/bundleAssets
+      - out/updateBundleiOS
+
+run-Android-bundleAssets:
+  stage: run
+  tags:
+    - python windows
+  only:
+    - master
+  needs: ["build-windows"]
+  script:
+    - mkdir -p out/bundleAssetsAndroid
+    - ./bin/windows/bundleAssets.exe -B 1141451	 -I ./data/fa690135 -O ./out/bundleAssetsAndroid
+  artifacts:
+    name: bundleAssetsOutAndroid
+    paths:
+      - out/bundleAssetsAndroid
+
+run-iOS-bundleAssets:
+  stage: run
+  tags:
+    - python windows
+  only:
+    - master
+  needs: ["build-windows"]
+  script:
+    - mkdir -p out/bundleAssetsiOS
+    - ./bin/windows/bundleAssets.exe -B 1141360	 -I ./data/fi690100 -O ./out/bundleAssetsiOS
+  artifacts:
+    name: bundleAssetsOutiOS
+    paths:
+      - out/bundleAssetsiOS
+
+package-out:
+  stage: package
+  tags:
+    - centos8 python3
+  only:
+    - master
+  needs: ["run-Android-updateBundle", "run-iOS-updateBundle", "run-Android-bundleAssets", "run-iOS-bundleAssets"]
+  script:
+    - ls out
+  artifacts:
+    name: all-out
+    paths:
+      - out
