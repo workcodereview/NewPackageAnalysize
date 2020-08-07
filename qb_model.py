@@ -344,6 +344,7 @@ class QB:
         else:
             return ''
 
+    # 转配置表txt文件为xls文件
     @staticmethod
     def _change_config_table_path(file_path):
         svn_path = ''
