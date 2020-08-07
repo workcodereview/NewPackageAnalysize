@@ -178,11 +178,15 @@ class QB:
             if values['includs']:
                 for index, file in enumerate(values['includs']):
                     if file.upper() not in self.ASSET_CACHE_PATH:
+                        file_path = self._change_audio_path(file)
                         svn_path = self._change_config_table_path(file)
-                        if svn_path == '':
-                            self.ASSET_CACHE_PATH[file.upper()] = {'svn_path': file, 'revision': self.build_svn}
-                        else:
+
+                        if file_path != '':
+                            self.ASSET_CACHE_PATH[file_path.upper()] = {'svn_path': file, 'revision': self.build_svn}
+                        elif svn_path != '':
                             self.ASSET_CACHE_PATH[file.upper()] = {'svn_path': svn_path, 'revision': self.build_svn}
+                        else:
+                            self.ASSET_CACHE_PATH[file.upper()] = {'svn_path': file, 'revision': self.build_svn}
             apk_dlc_other[key] = download_type
         logging.info('Save APK_DLC_OTHER success!!!')
         return apk_dlc_other
@@ -350,3 +354,12 @@ class QB:
             svn_path = file_path.replace('Assets/StreamingAssets/Config/Table/', 'Assets/JX3Game/Source/File/')
             svn_path = svn_path.replace('.txt', '.xls')
         return svn_path
+
+    @staticmethod
+    def _change_audio_path(file_path):
+        path = ''
+        if file_path.endswith('.wem') or file_path.endswith('.bnk'):
+            path = file_path.replace('Assets/StreamingAssets/Audio/GeneratedSoundBanks/Android/',
+                                          'Assets/StreamingAssets/Audio/')
+        return path
+

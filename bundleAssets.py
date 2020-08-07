@@ -92,16 +92,6 @@ def write_file(bundle_info_dict, asset_cache_path, queue_select, process_count):
                 asset_cache_path[file_path.upper()]['file_path'] = file_path
                 queue_select.put({'path': asset_cache_path[file_path.upper()], 'index': file_count})
                 file_count += 1
-            elif file_path.endswith('.wem') or file_path.endswith('.bnk'):
-                if 'Assets/StreamingAssets/Audio/Chinese(PRC)/' in file_path:
-                    replace_path = file_path.replace('Assets/StreamingAssets/Audio/Chinese(PRC)/', '')
-                if 'Assets/StreamingAssets/Audio/' in file_path:
-                    replace_path = file_path.replace('Assets/StreamingAssets/Audio/', '')
-                for key, value in asset_cache_path.items():
-                    if replace_path.upper() in key:
-                        asset_cache_path[key]['file_path'] = file_path
-                        queue_select.put({'path': asset_cache_path[key], 'index': file_count})
-                        file_count += 1
 
     # put process_count个None 给20个子进程标志数据已推送完毕
     for i in range(process_count):
