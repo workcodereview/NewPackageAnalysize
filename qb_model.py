@@ -177,14 +177,14 @@ class QB:
                 download_type = 'Unused'
             if values['includs']:
                 for index, file in enumerate(values['includs']):
+                    if file.endswith('.wem') or file.endswith('.bnk'):
+                        print('file: '+file)
                     if file.upper() not in self.ASSET_CACHE_PATH:
                         svn_path = self._change_config_table_path(file)
                         if svn_path == '':
-                            self.ASSET_CACHE_PATH[file.upper()] = {'svn_path': file,
-                                                               'revision': self.build_svn}
+                            self.ASSET_CACHE_PATH[file.upper()] = {'svn_path': file, 'revision': self.build_svn}
                         else:
-                            self.ASSET_CACHE_PATH[file.upper()] = {'svn_path': svn_path,
-                                                                   'revision': self.build_svn}
+                            self.ASSET_CACHE_PATH[file.upper()] = {'svn_path': svn_path, 'revision': self.build_svn}
             apk_dlc_other[key] = download_type
         logging.info('Save APK_DLC_OTHER success!!!')
         return apk_dlc_other
