@@ -178,8 +178,13 @@ class QB:
             if values['includs']:
                 for index, file in enumerate(values['includs']):
                     if file.upper() not in self.ASSET_CACHE_PATH:
-                        self.ASSET_CACHE_PATH[file.upper()] = {'svn_path': file,
+                        svn_path = self._change_config_table_path(file_path)
+                        if svn_path == '':
+                            self.ASSET_CACHE_PATH[file.upper()] = {'svn_path': file,
                                                                'revision': self.build_svn}
+                        else:
+                            self.ASSET_CACHE_PATH[file.upper()] = {'svn_path': svn_path,
+                                                                   'revision': self.build_svn}
             apk_dlc_other[key] = download_type
         logging.info('Save APK_DLC_OTHER success!!!')
         return apk_dlc_other
@@ -338,3 +343,11 @@ class QB:
             return file_content
         else:
             return ''
+
+    @staticmethod
+    def _change_config_table_path(file_path):
+        svn_path = ''
+        if file_path.endswith('.txt') and 'Assets/StreamingAssets/Config/Table/' in file_path:
+            svn_path = file_path.replace('Assets/StreamingAssets/Config/Table/', 'Assets/JX3Game/Source/File/')
+            svn_path = svn_path.replace('.txt', '.xls')
+        return svn_path
