@@ -178,7 +178,7 @@ class QB:
             if values['includs']:
                 for index, file in enumerate(values['includs']):
                     if file.upper() not in self.ASSET_CACHE_PATH:
-                        svn_path = self._change_config_table_path(file_path)
+                        svn_path = self._change_config_table_path(file)
                         if svn_path == '':
                             self.ASSET_CACHE_PATH[file.upper()] = {'svn_path': file,
                                                                'revision': self.build_svn}
