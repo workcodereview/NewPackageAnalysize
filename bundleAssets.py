@@ -94,7 +94,7 @@ def write_file(bundle_info_dict, asset_cache_path, queue_select, process_count):
                 if 'Assets/StreamingAssets/Audio/Chinese(PRC)/' in file_path:
                     replace_path = file_path.replace('Assets/StreamingAssets/Audio/Chinese(PRC)/', '')
                 if 'Assets/StreamingAssets/Audio/' in file_path:
-                    replace_path = replace_path.replace('Assets/StreamingAssets/Audio/', '')
+                    replace_path = file_path.replace('Assets/StreamingAssets/Audio/', '')
                 for key, value in asset_cache_path:
                     if replace_path.upper() in key:
                         asset_cache_path[key]['file_path'] = file_path

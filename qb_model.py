@@ -177,8 +177,6 @@ class QB:
                 download_type = 'Unused'
             if values['includs']:
                 for index, file in enumerate(values['includs']):
-                    if file.endswith('.wem') or file.endswith('.bnk'):
-                        print('file: '+file)
                     if file.upper() not in self.ASSET_CACHE_PATH:
                         svn_path = self._change_config_table_path(file)
                         if svn_path == '':
