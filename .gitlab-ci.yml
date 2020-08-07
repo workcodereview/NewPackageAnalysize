@@ -2,8 +2,8 @@ before_script:
 
 stages:
   - build
-  - package
   - run
+  - package
 
 build-linux:
   stage: build
@@ -77,20 +77,6 @@ build-windows:
     paths:
       - bin/windows
 
-package:
-  stage: package
-  tags:
-    - centos8 python3
-  only:
-    - master
-  needs: ["build-linux", "build-mac", "build-windows"]
-  script:
-    - ls bin
-  artifacts:
-    name: all
-    paths:
-      - bin
-
 run-Android-updateBundle:
   stage: run
   tags:
@@ -150,6 +136,20 @@ run-iOS-bundleAssets:
     name: bundleAssetsOutiOS
     paths:
       - out/bundleAssetsiOS
+
+package-bin:
+  stage: package
+  tags:
+    - centos8 python3
+  only:
+    - master
+  needs: ["build-linux", "build-mac", "build-windows"]
+  script:
+    - ls bin
+  artifacts:
+    name: all
+    paths:
+      - bin
 
 package-out:
   stage: package
