@@ -33,7 +33,7 @@ build-linux:
 build-mac:
   stage: build
   tags:
-    - python mac
+    - zy mac
   only:
     - master
   script:
@@ -80,7 +80,7 @@ build-windows:
 run-Android-updateBundle:
   stage: run
   tags:
-    - python windows
+    - zy windows
   only:
     - master
   needs: ["build-windows"]
@@ -95,7 +95,7 @@ run-Android-updateBundle:
 run-iOS-updateBundle:
   stage: run
   tags:
-    - python windows
+    - zy windows
   only:
     - master
   needs: ["build-windows"]
@@ -110,7 +110,7 @@ run-iOS-updateBundle:
 run-Android-bundleAssets:
   stage: run
   tags:
-    - python windows
+    - zy windows
   only:
     - master
   needs: ["build-windows"]
@@ -125,7 +125,7 @@ run-Android-bundleAssets:
 run-iOS-bundleAssets:
   stage: run
   tags:
-    - python windows
+    - zy windows
   only:
     - master
   needs: ["build-windows"]
