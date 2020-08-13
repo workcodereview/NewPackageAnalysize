@@ -5,7 +5,7 @@ stages:
   - run
   - package
 
-build-linux:
+build_linux:
   stage: build
   tags:
     - centos8 python3
@@ -29,6 +29,7 @@ build-linux:
     name: linux
     paths:
       - bin/linux
+  when: manual
 
 build-mac:
   stage: build
@@ -37,14 +38,17 @@ build-mac:
   only:
     - master
   script:
-    - source ~/.bashrc
     - mkdir -p bin/mac
 
-    - pyinstaller -F bundleAssets.py -p /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages
+    - pip install redis
+    - pip install requests
+    - pip install elementpath
+
+    - pyinstaller -F bundleAssets.py
     - dist/bundleAssets -h
     - cp dist/bundleAssets bin/mac/bundleAssets
     
-    - pyinstaller -F updateBundle.py -p /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages
+    - pyinstaller -F updateBundle.py
     - dist/updateBundle -h
     - cp dist/updateBundle bin/mac/updateBundle
   artifacts:
@@ -76,6 +80,7 @@ build-windows:
     name: windows
     paths:
       - bin/windows
+  when: manual
 
 run-Android-updateBundle:
   stage: run
