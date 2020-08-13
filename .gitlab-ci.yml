@@ -29,8 +29,6 @@ build-linux:
     name: linux
     paths:
       - bin/linux
-  when: delayed
-  start_in: 600 seconds
 
 build-mac:
   stage: build
@@ -56,8 +54,6 @@ build-mac:
     name: mac
     paths:
       - bin/mac
-  when: delayed
-  start_in: 600 seconds
 
 build-windows:
   stage: build
@@ -83,8 +79,6 @@ build-windows:
     name: windows
     paths:
       - bin/windows
-  when: delayed
-  start_in: 600 seconds
 
 run-Android-updateBundle:
   stage: run
