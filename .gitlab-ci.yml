@@ -29,7 +29,6 @@ build-linux:
     name: linux
     paths:
       - bin/linux
-  when: manual
 
 build-mac:
   stage: build
@@ -80,12 +79,11 @@ build-windows:
     name: windows
     paths:
       - bin/windows
-  when: manual
 
 run-Android-updateBundle:
   stage: run
   tags:
-    - zy windows
+    - zy
   only:
     - master
   needs: ["build-windows"]
@@ -100,7 +98,7 @@ run-Android-updateBundle:
 run-iOS-updateBundle:
   stage: run
   tags:
-    - zy windows
+    - zy
   only:
     - master
   needs: ["build-windows"]
@@ -115,7 +113,7 @@ run-iOS-updateBundle:
 run-Android-bundleAssets:
   stage: run
   tags:
-    - zy windows
+    - zy
   only:
     - master
   needs: ["build-windows"]
@@ -130,7 +128,7 @@ run-Android-bundleAssets:
 run-iOS-bundleAssets:
   stage: run
   tags:
-    - zy windows
+    - zy
   only:
     - master
   needs: ["build-windows"]
