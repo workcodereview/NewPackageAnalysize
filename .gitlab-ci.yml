@@ -1,4 +1,8 @@
-before_script:
+.pip_install:
+  before_script:
+    - pip install redis
+    - pip install requests
+    - pip install elementpath
 
 stages:
   - build
@@ -11,12 +15,9 @@ build-linux:
     - centos8 python3
   only:
     - master
+  extends: .pip_install
   script:
     - mkdir -p bin/linux
-
-    - pip install redis
-    - pip install requests
-    - pip install elementpath
 
     - pyinstaller -F bundleAssets.py
     - dist/bundleAssets -h
@@ -36,12 +37,9 @@ build-mac:
     - mac python3
   only:
     - master
+  extends: .pip_install
   script:
     - mkdir -p bin/mac
-
-    - pip install redis
-    - pip install requests
-    - pip install elementpath
 
     - pyinstaller -F bundleAssets.py
     - dist/bundleAssets -h
@@ -61,12 +59,9 @@ build-windows:
     - windows10 python3
   only:
     - master
+  extends: .pip_install
   script:
     - mkdir -p bin/windows
-
-    - pip install redis
-    - pip install requests
-    - pip install elementpath
 
     - pyinstaller -F bundleAssets.py
     - dist/bundleAssets.exe -h
