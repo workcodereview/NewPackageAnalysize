@@ -5,7 +5,7 @@ stages:
   - run
   - package
 
-build_linux:
+build-linux:
   stage: build
   tags:
     - centos8 python3
