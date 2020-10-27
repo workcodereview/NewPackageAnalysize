@@ -121,89 +121,89 @@ def analysis_calc_worker(arg):
 
 if __name__ == '__main__':
 
-    redis_client = redis.Redis(host=redis_host, password=redis_password, port=redis_port, decode_responses=True)
-    trun_path = trunk_dir + 'Assets/JX3Game/Package/Prefab/Npc/Npc/Instance/FYDXC/DD_FB_FYDXC_WMKLBOX.controller'
-    svn_message = get_log(redis_client, trun_path, 680043)
-    print('svn_message: '+str(svn_message))
+    # redis_client = redis.Redis(host=redis_host, password=redis_password, port=redis_port, decode_responses=True)
+    # trun_path = trunk_dir + 'Assets/JX3Game/Package/Prefab/Npc/Npc/Instance/FYDXC/DD_FB_FYDXC_WMKLBOX.controller'
+    # svn_message = get_log(redis_client, trun_path, 680043)
+    # print('svn_message: '+str(svn_message))
 
-    # multiprocessing.freeze_support()
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('-B', '--baseline-buildid', help="baseline buildid", type=int, required=True)
-    # parser.add_argument('-I', '--input-path', help="input_path", required=True)
-    # parser.add_argument('-O', '--out-path', help="out_path", required=True)
-    # args = parser.parse_args()
-    #
-    # status = 1
-    # if args.input_path.find('\\'):
-    #     args.input_path = args.input_path.replace('\\', '/')
-    #
-    # if args.out_path.find('\\'):
-    #     args.out_path = args.out_path.replace('\\', '/')
-    # if not os.path.exists(args.out_path):
-    #     os.mkdir(args.out_path)
-    #
-    # process_count = 25
-    # start_time = time.time()
-    #
-    # Qb_Message = QB(args.baseline_buildid, 'trunk', args.input_path,  args.out_path)
-    # analysis_calc_process = multiprocessing.Process(target=analysis_calc_worker, args=(args,))
-    # analysis_calc_process.daemon = True
-    # analysis_calc_process.start()
-    #
-    # # 查询队列
-    # q_select = Queue()
-    # # 结果队列
-    # q_result = Queue()
-    #
-    # # 子进程负责写文件到队列中 另一子进程从队列拿数据处理 在写入
-    # write_file_process = multiprocessing.Process(target=write_file, args=(Qb_Message.BUNDLE_INFO_DICT,
-    #                                                                       Qb_Message.ASSET_CACHE_PATH, q_select,
-    #                                                                       process_count,))
-    # write_file_process.daemon = True
-    # write_file_process.start()
-    #
-    # # 开启20个进程从q_select队列中获取要查询svn信息的文件 并将结果写入q_write队列中
-    # process_list = []
-    # for i in range(process_count):
-    #     process_list.append(multiprocessing.Process(target=get_svn, args=(q_result, q_select, i)))
-    #
-    # for process in process_list:
-    #     process.daemon = True
-    #
-    # for single_process in process_list:
-    #     single_process.start()
-    #
-    # # 从写队列中获取结果存入svn_file.tab中
-    # print('[主进程任务]: 开始写svn_file文件')
-    # f_write = codecs.open(args.out_path + '/svn_file.tab', 'w', 'utf-8')
-    # f_write.write('fileName\tsvn_file\tauthor\tdate\tfrom_path\tnumber_message\trevision\n')
-    # count = 0
-    # file_count = 0
-    # while True:
-    #     q_info = q_result.get()
-    #     if q_info is None:
-    #         count += 1
-    #         print('[主进程任务]: 当前第'+str(count)+'个子进程结束')
-    #         if process_count == count:
-    #             break
-    #         continue
-    #     file_count += 1
-    #     message = q_info['msg'].strip()
-    #     if '\n' in message:
-    #         message = message.replace('\n', ' ')
-    #     if '\t' in message:
-    #         message = message.replace('\t', ' ')
-    #
-    #     f_write.write(q_info['file_path'] + '\t' + q_info['svn_path'] + '\t' +
-    #                   q_info['author'] + '\t' + q_info['date'] + '\t' +
-    #                   q_info['logfrom_path'] + '\t' + message +
-    #                   '\t' + str(q_info['revision']) + '\n')
-    # f_write.close()
-    # print('[主进程任务]: 写svn_file文件完成')
-    # analysis_calc_process.join()
-    # print('[主进程任务]: join完成')
-    # end_time = time.time()
-    # print('共耗时: ' + str(end_time - start_time))
-    #
-    # status = 0
-    # sys.exit(status)
+    multiprocessing.freeze_support()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-B', '--baseline-buildid', help="baseline buildid", type=int, required=True)
+    parser.add_argument('-I', '--input-path', help="input_path", required=True)
+    parser.add_argument('-O', '--out-path', help="out_path", required=True)
+    args = parser.parse_args()
+
+    status = 1
+    if args.input_path.find('\\'):
+        args.input_path = args.input_path.replace('\\', '/')
+
+    if args.out_path.find('\\'):
+        args.out_path = args.out_path.replace('\\', '/')
+    if not os.path.exists(args.out_path):
+        os.mkdir(args.out_path)
+
+    process_count = 25
+    start_time = time.time()
+
+    Qb_Message = QB(args.baseline_buildid, 'trunk', args.input_path,  args.out_path)
+    analysis_calc_process = multiprocessing.Process(target=analysis_calc_worker, args=(args,))
+    analysis_calc_process.daemon = True
+    analysis_calc_process.start()
+
+    # 查询队列
+    q_select = Queue()
+    # 结果队列
+    q_result = Queue()
+
+    # 子进程负责写文件到队列中 另一子进程从队列拿数据处理 在写入
+    write_file_process = multiprocessing.Process(target=write_file, args=(Qb_Message.BUNDLE_INFO_DICT,
+                                                                          Qb_Message.ASSET_CACHE_PATH, q_select,
+                                                                          process_count,))
+    write_file_process.daemon = True
+    write_file_process.start()
+
+    # 开启20个进程从q_select队列中获取要查询svn信息的文件 并将结果写入q_write队列中
+    process_list = []
+    for i in range(process_count):
+        process_list.append(multiprocessing.Process(target=get_svn, args=(q_result, q_select, i)))
+
+    for process in process_list:
+        process.daemon = True
+
+    for single_process in process_list:
+        single_process.start()
+
+    # 从写队列中获取结果存入svn_file.tab中
+    print('[主进程任务]: 开始写svn_file文件')
+    f_write = codecs.open(args.out_path + '/svn_file.tab', 'w', 'utf-8')
+    f_write.write('fileName\tsvn_file\tauthor\tdate\tfrom_path\tnumber_message\trevision\n')
+    count = 0
+    file_count = 0
+    while True:
+        q_info = q_result.get()
+        if q_info is None:
+            count += 1
+            print('[主进程任务]: 当前第'+str(count)+'个子进程结束')
+            if process_count == count:
+                break
+            continue
+        file_count += 1
+        message = q_info['msg'].strip()
+        if '\n' in message:
+            message = message.replace('\n', ' ')
+        if '\t' in message:
+            message = message.replace('\t', ' ')
+
+        f_write.write(q_info['file_path'] + '\t' + q_info['svn_path'] + '\t' +
+                      q_info['author'] + '\t' + q_info['date'] + '\t' +
+                      q_info['logfrom_path'] + '\t' + message +
+                      '\t' + str(q_info['revision']) + '\n')
+    f_write.close()
+    print('[主进程任务]: 写svn_file文件完成')
+    analysis_calc_process.join()
+    print('[主进程任务]: join完成')
+    end_time = time.time()
+    print('共耗时: ' + str(end_time - start_time))
+
+    status = 0
+    sys.exit(status)
