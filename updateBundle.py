@@ -51,7 +51,7 @@ def get_log(redis_client, path, revision, current_path=None, previous_info=None)
 
 
 def get_svn(q_write, q_read):
-    redis_client = redis.Redis(host=redis_host, password=redis_password, port=redis_port, decode_responses=True)
+    redis_client = redis.Redis(host=redis_host, password=redis_password, port=redis_port, db=2, decode_responses=True)
     while True:
         read_info = q_read.get()
         if read_info is None:
